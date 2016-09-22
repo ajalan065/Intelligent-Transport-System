@@ -28,11 +28,11 @@ public class LineGraph {
         dataset = new XYMultipleSeriesDataset();
 
         xSeries = new XYSeries("X");
-        ySeries = new XYSeries("Y");
+        //ySeries = new XYSeries("Y");
 
         // Add new XY series to the list
         dataset.addSeries(xSeries);
-        dataset.addSeries(ySeries);
+        //dataset.addSeries(ySeries);
 
         // Renderer for the X series
         xRenderer = new XYSeriesRenderer();
@@ -44,13 +44,13 @@ public class LineGraph {
         xRenderer.setLineWidth(3f);
 
         // Renderer for the Y series
-        yRenderer = new XYSeriesRenderer();
+        /*yRenderer = new XYSeriesRenderer();
         yRenderer.setColor(Color.GREEN);
         yRenderer.setPointStyle(PointStyle.CIRCLE);
         yRenderer.setFillPoints(true);
         yRenderer.setLineWidth(1);
         yRenderer.setDisplayChartValues(false);
-        yRenderer.setLineWidth(3f);
+        yRenderer.setLineWidth(3f);*/
 
         // Renders the display and the orientation of the chart
         multiRenderer = new XYMultipleSeriesRenderer();
@@ -65,7 +65,7 @@ public class LineGraph {
             multiRenderer.addYTextLabel(i,(i*2)+"");
         }
         multiRenderer.addSeriesRenderer(xRenderer);
-        multiRenderer.addSeriesRenderer(yRenderer);
+        //multiRenderer.addSeriesRenderer(yRenderer);
         multiRenderer.setInScroll(true);
         multiRenderer.setZoomEnabled(true);
     }
@@ -81,4 +81,22 @@ public class LineGraph {
         return mChart;
     }
 
+    public void addPoints(LightData point) {
+        if (point.getTimestamp() >= 10000) {
+            multiRenderer.setXAxisMax(point.getTimestamp());
+            multiRenderer.setXAxisMin(point.getTimestamp()-10000);
+        }
+        else {
+            multiRenderer.setXAxisMax(9999);
+            multiRenderer.setXAxisMin(0);
+        }
+        xSeries.add(point.getTimestamp(), point.getX());
+        //ySeries.add(point.getTimestamp(), point.getY());
+    }
+
+    public void addPreviousPoint(long time){
+        int position = xSeries.getItemCount();
+        xSeries.add(time,xSeries.getY(position-1));
+        //ySeries.add(time,ySeries.getY(position-1));
+    }
 }
