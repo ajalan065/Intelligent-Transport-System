@@ -110,7 +110,7 @@ public class MainActivity extends Activity implements SensorEventListener {
                 started = false;
                 start.setEnabled(true);
                 stop.setEnabled(false);
-                //writeEntireData();
+                writeEntireData(now);
                 takeScreenShot(now);
                 sensorManager.unregisterListener(MainActivity.this);
 
@@ -161,28 +161,30 @@ public class MainActivity extends Activity implements SensorEventListener {
         }
     }
 
-    public void writeEntireData() {
+    /**
+     * Write the log of the entire data captured while the sensor was active
+     * @param now
+     */
+    public void writeEntireData(Date now) {
         try {
-            Date now = new Date();
             android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
-            File dataFile = new File("Light Data" + entire_path.getAbsolutePath(), now.toString() + ".txt");
-            dataFile.createNewFile();
+            File dataFile = new File(entire_path.getAbsolutePath(), "_" + now.toString() + ".txt");
             FileOutputStream writer = new FileOutputStream(dataFile);
             writer.write((sensorData+"").getBytes());
             writer.flush();
             writer.close();
-            Toast.makeText(this, "Stopped", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Entire path recorded", Toast.LENGTH_SHORT).show();
         }
-        catch(IOException e)
-        {
+        catch(IOException e) {
             e.printStackTrace();
-            Toast.makeText(this, "Error writing EntirePath Set", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error writing entire path", Toast.LENGTH_SHORT).show();
 
         }
     }
 
     /**
      * Capture the screenshot whenever the sensor is stopped
+     * @param now
      */
     protected void takeScreenShot(Date now) {
        String path = result_folder.getAbsolutePath() + "/" + "_" + now.toString() + ".jpg";
@@ -198,10 +200,10 @@ public class MainActivity extends Activity implements SensorEventListener {
             bitmap.compress(Bitmap.CompressFormat.JPEG, quality, outputStream);
             outputStream.flush();
             outputStream.close();
+            Toast.makeText(this, "Snapshot captured", Toast.LENGTH_SHORT).show();
         } catch (Throwable e) {
             e.printStackTrace();
             Toast.makeText(this, "Error generating screenshot", Toast.LENGTH_SHORT).show();
         }
-
     }
 }
