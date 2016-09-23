@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,14 +32,13 @@ public class MainActivity extends Activity implements SensorEventListener {
     //declare Variables
     private boolean started = false;
     private SensorManager sensorManager;
-    TextView tvLight, lightValue;
-    Sensor lightSensor;
-    Button start, stop;
+    TextView lightValue;
+    Sensor lightSensor, batterySensor;
+    Button lightStart, lightStop;
     private GraphicalView view;
-    private LineGraph line;
+    private LightLineGraph lightLine;
     private LinearLayout layout;
     private ArrayList<LightData> sensorData,resultData;
-    private EditText result;
     File result_folder, entire_path, training;
     
 
@@ -50,24 +48,23 @@ public class MainActivity extends Activity implements SensorEventListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
 
-        tvLight = (TextView)findViewById(R.id.tvLight);
         lightValue = (TextView)findViewById(R.id.lightValue);
         //create instance of sensor manager and get system service to interact with Sensor
         sensorManager= (SensorManager)getSystemService(Context.SENSOR_SERVICE);
         lightSensor= sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        start = (Button)findViewById(R.id.start);
-        stop = (Button)findViewById(R.id.stop);
+        lightStart = (Button)findViewById(R.id.lightStart);
+        lightStop = (Button)findViewById(R.id.lightStop);
         layout = (LinearLayout) findViewById(R.id.chart_container);
 
-        start.setEnabled(true);
-        stop.setEnabled(false);
+        lightStart.setEnabled(true);
+        lightStop.setEnabled(false);
 
-        start.setOnClickListener(new View.OnClickListener() {
+        lightStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 started = true;
-                start.setEnabled(false);
-                stop.setEnabled(true);
+                lightStart.setEnabled(false);
+                lightStop.setEnabled(true);
 
                 try {
                     File root = new File(Environment.getExternalStorageDirectory() + "/LightExperiment");
@@ -96,20 +93,20 @@ public class MainActivity extends Activity implements SensorEventListener {
                 sensorData = new ArrayList<LightData>();
                 resultData = new ArrayList<LightData>();
                 layout.removeAllViews();
-                line = new LineGraph();
-                view = line.getGraph(MainActivity.this);
+                lightLine = new LightLineGraph();
+                view = lightLine.getGraph(MainActivity.this);
                 layout.addView(view);
                 sensorManager.registerListener(MainActivity.this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
             }
         });
 
-        stop.setOnClickListener(new View.OnClickListener() {
+        lightStop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Date now =new Date();
                 started = false;
-                start.setEnabled(true);
-                stop.setEnabled(false);
+                lightStart.setEnabled(true);
+                lightStop.setEnabled(false);
                 writeEntireData(now);
                 takeScreenShot(now);
                 sensorManager.unregisterListener(MainActivity.this);
@@ -148,7 +145,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             double y = event.values[1];
             long timestamp = System.currentTimeMillis();
             LightData data = new LightData(timestamp, x/2, y/2);
-            line.addPoints(data);
+            lightLine.addPoints(data);
             LightData data2 = new LightData(timestamp, x, y);
             sensorData.add(data);
             resultData.add(data);
@@ -165,7 +162,7 @@ public class MainActivity extends Activity implements SensorEventListener {
      * Write the log of the entire data captured while the sensor was active
      * @param now
      */
-    public void writeEntireData(Date now) {
+    protected void writeEntireData(Date now) {
         try {
             android.text.format.DateFormat.format("yyyy-MM-dd_hh:mm:ss", now);
             File dataFile = new File(entire_path.getAbsolutePath(), "_" + now.toString() + ".txt");
@@ -205,5 +202,12 @@ public class MainActivity extends Activity implements SensorEventListener {
             e.printStackTrace();
             Toast.makeText(this, "Error generating screenshot", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /**
+     * Check for the battery status.
+     */
+    protected boolean checkBatteryStatus() {
+        return false;
     }
 }

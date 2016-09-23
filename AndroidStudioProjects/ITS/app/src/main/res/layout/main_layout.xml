@@ -10,20 +10,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="10dp"
         android:text="Light Sensor"
         android:textColor="#357345"
         android:textSize="30sp" />
-    <TextView
-        android:id="@+id/tvLight"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/TextView"
-        android:layout_marginTop="10dp"
-        android:textSize="20sp"
-        />
     <Button
-        android:id="@+id/start"
+        android:id="@+id/lightStart"
         android:text="Start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -32,7 +24,7 @@
         android:layout_below="@id/TextView"
         />
     <Button
-        android:id="@+id/stop"
+        android:id="@+id/lightStop"
         android:text="Stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -46,13 +38,14 @@
         android:layout_width="350dp"
         android:layout_height="350dp"
         android:id="@+id/chart_container"
+        android:layout_below="@+id/lightValue"
         android:layout_centerVertical="true">
     </LinearLayout>
     <TextView
         android:id="@+id/lightValue"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/stop"
+        android:layout_below="@id/lightStop"
         android:layout_marginBottom="10dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"

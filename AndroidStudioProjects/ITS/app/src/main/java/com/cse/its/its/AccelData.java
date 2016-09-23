@@ -1,11 +1,13 @@
 package com.cse.its.its;
 
 /**
- * Created by ajalan on 16/9/16.
+ * Created by ajalan on 24/9/16.
  */
-public class LightData {
+public class AccelData {
     private long timestamp;
-    private double x, y;
+    private double x;
+    private double y;
+    private double z;
 
     /**
      * Constructor defined
@@ -13,10 +15,11 @@ public class LightData {
      * @param x
      * @param y
      */
-    public LightData(long timestamp, double x, double y) {
+    public AccelData(long timestamp, double x, double y, double z) {
         this.timestamp = timestamp;
         this.x = x;
         this.y = y;
+        this.z = z;
     }
 
     /**
@@ -60,7 +63,7 @@ public class LightData {
     }
 
     /**
-     * Set the value of x
+     * Set the value of y
      * @param y
      */
     public void setY(double y) {
@@ -68,10 +71,26 @@ public class LightData {
     }
 
     /**
+     * Get the value of z
+     * @return double
+     */
+    public double getZ() {
+        return z;
+    }
+
+    /**
+     * Set the value of z
+     * @param z
+     */
+    public void setZ(double z) {
+        this.z = z;
+    }
+
+    /**
      * Converts the timestamp to string
      * @return string
      */
     public String toString() {
-        return "t="+timestamp+"x x="+x;
+        return "t="+timestamp+", x="+x+", y="+y+", z="+z;
     }
 }
