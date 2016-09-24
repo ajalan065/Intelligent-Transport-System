@@ -36,7 +36,7 @@ public class LightLineGraph {
 
         // Renderer for the X series
         xRenderer = new XYSeriesRenderer();
-        xRenderer.setColor(Color.RED);
+        xRenderer.setColor(Color.GREEN);
         xRenderer.setPointStyle(PointStyle.CIRCLE);
         xRenderer.setFillPoints(true);
         xRenderer.setLineWidth(1);
@@ -55,7 +55,7 @@ public class LightLineGraph {
         // Renders the display and the orientation of the chart
         multiRenderer = new XYMultipleSeriesRenderer();
         multiRenderer.setXLabels(0);
-        multiRenderer.setLabelsColor(Color.RED);
+        multiRenderer.setLabelsColor(Color.GREEN);
         multiRenderer.setChartTitle("t vs (x,y)");
         multiRenderer.setXTitle("Sensor Data");
         multiRenderer.setYTitle("Intensity Value");

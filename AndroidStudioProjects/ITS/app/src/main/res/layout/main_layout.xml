@@ -1,56 +1,169 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-     >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/TextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:text="Light Sensor"
-        android:textColor="#357345"
-        android:textSize="30sp" />
-    <Button
-        android:id="@+id/lightStart"
-        android:text="Start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="5dp"
-        android:layout_toStartOf="@+id/TextView"
-        android:layout_below="@id/TextView"
-        />
-    <Button
-        android:id="@+id/lightStop"
-        android:text="Stop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="15dp"
-        android:layout_toEndOf="@+id/TextView"
-        android:layout_below="@id/TextView"
-        />
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_centerHorizontal="true"
-        android:layout_width="350dp"
-        android:layout_height="350dp"
-        android:id="@+id/chart_container"
-        android:layout_below="@+id/lightValue"
-        android:layout_centerVertical="true">
-    </LinearLayout>
-    <TextView
-        android:id="@+id/lightValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/lightStop"
-        android:layout_marginBottom="10dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:textSize="20sp"
-        android:layout_centerInParent="true"
-        />
+    <RelativeLayout
+        android:id="@+id/layout1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/TextView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="Accelerometer"
+            android:textColor="#336699"
+            android:textSize="30sp" />
+
+        <Button
+            android:id="@+id/accelStart"
+            android:text="Start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_toStartOf="@+id/TextView2"
+            android:layout_below="@id/TextView2"
+            android:layout_alignParentLeft="true"
+            />
+        <Button
+            android:id="@+id/accelStop"
+            android:text="Stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:layout_toEndOf="@+id/TextView2"
+            android:layout_below="@id/TextView2"
+            android:layout_alignParentRight="true"
+            />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            android:id="@+id/chart_container2"
+            android:layout_weight="0.40"
+            android:layout_below="@+id/accelStop"
+            android:layout_centerHorizontal="true"></LinearLayout>
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:id="@+id/layout2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/TextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="      Light      "
+            android:textColor="#357345"
+            android:textSize="30sp"
+            />
+
+        <Button
+            android:id="@+id/lightStart"
+            android:text="Start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_toStartOf="@+id/TextView"
+            android:layout_below="@id/TextView"
+            />
+
+        <Button
+            android:id="@+id/lightStop"
+            android:text="Stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_toEndOf="@+id/TextView"
+            android:layout_below="@id/TextView"
+            />
+
+        <TextView
+            android:id="@+id/lightValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/lightStop"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textSize="20sp"
+            android:layout_centerInParent="true"
+            />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_centerHorizontal="true"
+            android:layout_width="350dp"
+            android:layout_height="350dp"
+            android:id="@+id/chart_container"
+            android:layout_below="@+id/lightValue"
+            android:layout_centerVertical="true">
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/layout3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/TextView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:text="     Sound     "
+            android:textColor="#800000"
+            android:textSize="30sp"/>
+
+        <Button
+            android:id="@+id/soundStart"
+            android:text="Start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_toStartOf="@+id/TextView3"
+            android:layout_below="@id/TextView3"
+            android:layout_alignParentLeft="true"
+            />
+
+        <Button
+            android:id="@+id/soundStop"
+            android:text="Stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="15dp"
+            android:layout_toEndOf="@+id/TextView3"
+            android:layout_below="@id/TextView3"
+            android:layout_alignParentRight="true"
+            />
+
+        <TextView
+            android:id="@+id/soundValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/soundStop"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textSize="20sp"
+            android:layout_centerInParent="true"
+            />
+
+    </RelativeLayout>
+
+</LinearLayout>
