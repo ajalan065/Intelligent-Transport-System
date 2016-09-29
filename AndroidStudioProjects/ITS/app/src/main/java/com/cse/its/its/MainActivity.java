@@ -1,14 +1,10 @@
 package com.cse.its.its;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -20,7 +16,6 @@ import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import android.widget.Button;
@@ -32,7 +27,6 @@ import android.widget.Toast;
 import org.achartengine.GraphicalView;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,9 +56,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     File result_folder, entire_path, training, its, result_folder2, entire_path2, training2, result_folder3, entire_path3, training3, folder1;
     private EditText result;
     private String transport;
-
-    //Remove this
-    Button notific;
+    // Interval of sending notification
+    private final static int INTERVAL = 1000*60*2; // Every 2 minutes
 
 
     /** Called when the activity is first created. */
@@ -95,9 +88,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         layout = (LinearLayout)findViewById(R.id.chart_container);
         layout2 = (LinearLayout)findViewById(R.id.chart_container2);
         layout3 = (LinearLayout)findViewById(R.id.chart_container3);
-
-        // Remove this
-        notific = (Button)findViewById(R.id.noti);
 
         lightStart.setEnabled(true);
         lightStop.setEnabled(false);
@@ -346,6 +336,17 @@ public class MainActivity extends Activity implements SensorEventListener {
                 //sensorManager.registerListener(MainActivity.this, soundSensor, SensorManager.SENSOR_DELAY_NORMAL);
             }
         });
+
+        // Check the battery status every two minutes.
+        final Handler mHandler = new Handler();
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getBatteryPercentage();
+                mHandler.postDelayed(this, INTERVAL);
+            }
+        }, INTERVAL);
+
     }
 
     @Override
@@ -520,8 +521,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     /**
      * Check for the battery status.
      */
-    private void getBatteryPercentage() {
-        BroadcastReceiver batteryLevelReceiver = new BroadcastReceiver() {
+    protected void getBatteryPercentage() {
+        /*BroadcastReceiver batteryLevelReceiver = new BroadcastReceiver() {
             public void onReceive(Context context, Intent intent) {
                 context.unregisterReceiver(this);
                 int currentLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
@@ -534,14 +535,32 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         };
         IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
-        registerReceiver(batteryLevelReceiver, batteryLevelFilter);
+        registerReceiver(batteryLevelReceiver, batteryLevelFilter);*/
+
+        IntentFilter filter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        Intent batteryStatus = registerReceiver(null, filter);
+        int chargeState = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        int currentLevel = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+        int scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+        int level = -1;
+        if (currentLevel >= 0 && scale > 0) {
+            level = (currentLevel * 100) / scale;
+        }
+        // If the device is in charging state or if the barrery level is above 15%
+        if (chargeState == BatteryManager.BATTERY_STATUS_CHARGING || level >= 15) {
+            // do nothing
+        }
+
+        // If battery level is below 15%
+        else {
+            getNotification();
+        }
     }
 
     /**
-     * Display the notification based on battery status
-     * @param v
+     * Display the notification based on battery status.
      */
-    public void getNotification(View v) {
+    public void getNotification() {
         final int NOTIFICATION_ID = 0;
         PendingIntent dismissIntent = CustomNotification.dismissNotification(NOTIFICATION_ID, this);
         PendingIntent actionIntent = CustomNotification.acceptNotification(NOTIFICATION_ID, this);
@@ -549,7 +568,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         // Build the notification object along with its custom values.
         Notification notif = new Notification.Builder(this)
-                .setSmallIcon(R.drawable.ic_stat_battery)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setContentTitle("Intelligent Transport System")
                 .setContentText("Low Battery Warning")
                 .setTicker("Intelligent Transport System Notification")
@@ -561,9 +580,8 @@ public class MainActivity extends Activity implements SensorEventListener {
         // Set the default vibration and sound features.
         notif.defaults |= Notification.DEFAULT_VIBRATE;
         notif.defaults |= Notification.DEFAULT_SOUND;
-
+        // Show the notification
         notManager.notify(NOTIFICATION_ID,notif);
     }
-
 
 }
