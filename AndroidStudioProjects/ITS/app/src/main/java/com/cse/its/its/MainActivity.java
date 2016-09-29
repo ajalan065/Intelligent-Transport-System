@@ -1,14 +1,27 @@
 package com.cse.its.its;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.PowerManager;
+import android.support.v4.app.NotificationCompat;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,14 +44,13 @@ import java.util.Date;
 public class MainActivity extends Activity implements SensorEventListener {
     //SensorManager lets you access the device's sensors
     //declare Variables
-    private boolean lightstarted = false;
-    private boolean accelstarted = false;
-    private boolean soundstarted = false;
+    private boolean lightstarted = false, accelstarted = false, soundstarted = false;
     private SensorManager sensorManager;
-    TextView lightValue;
-    Sensor lightSensor, batterySensor, accelSensor, soundSensor;
+    protected Handler mHandler = new Handler();
+    TextView lightValue, battery;
+    Sensor lightSensor, batterySensor, accelSensor;
     SensorEventListener mSensorListener;
-    Button lightStart, lightStop, accelStart, accelStop, soundStart, soundStop;
+    Button lightStart, lightStop, accelStart, accelStop, soundStart, soundStop, bmp, ph, sbrk, ibrk;
     private GraphicalView view, view2, view3;
     private LightLineGraph lightLine;
     private AccelLineGraph accelLine;
@@ -50,13 +62,19 @@ public class MainActivity extends Activity implements SensorEventListener {
     File result_folder, entire_path, training, its, result_folder2, entire_path2, training2, result_folder3, entire_path3, training3, folder1;
     private EditText result;
     private String transport;
-    
+
+    //Remove this
+    Button notific;
+
 
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_layout);
+
+        getBatteryPercentage();
 
         lightValue = (TextView)findViewById(R.id.lightValue);
         //create instance of sensor manager and get system service to interact with Sensor
@@ -70,8 +88,16 @@ public class MainActivity extends Activity implements SensorEventListener {
         accelStop = (Button)findViewById(R.id.accelStop);
         soundStart = (Button)findViewById(R.id.soundStart);
         soundStop = (Button)findViewById(R.id.soundStop);
-        layout = (LinearLayout) findViewById(R.id.chart_container);
-        layout2 = (LinearLayout) findViewById(R.id.chart_container2);
+        bmp = (Button)findViewById(R.id.button_bmp);
+        ph = (Button)findViewById(R.id.button_ph);
+        ibrk = (Button)findViewById(R.id.button_ibrk);
+        sbrk = (Button)findViewById(R.id.button_sbrk);
+        layout = (LinearLayout)findViewById(R.id.chart_container);
+        layout2 = (LinearLayout)findViewById(R.id.chart_container2);
+        layout3 = (LinearLayout)findViewById(R.id.chart_container3);
+
+        // Remove this
+        notific = (Button)findViewById(R.id.noti);
 
         lightStart.setEnabled(true);
         lightStop.setEnabled(false);
@@ -79,8 +105,14 @@ public class MainActivity extends Activity implements SensorEventListener {
         accelStop.setEnabled(false);
         soundStart.setEnabled(true);
         soundStop.setEnabled(false);
+        bmp.setEnabled(false);
+        ph.setEnabled(false);
+        ibrk.setEnabled(false);
+        sbrk.setEnabled(false);
 
-        transport=ModeOfTransport.getMode();
+        transport = ModeOfTransport.getMode();
+
+        //battery = (TextView)findViewById(R.id.battery);
 
         // On starting the accelerometer
         accelStart.setOnClickListener(new View.OnClickListener() {
@@ -89,6 +121,10 @@ public class MainActivity extends Activity implements SensorEventListener {
                 accelstarted = true;
                 accelStart.setEnabled(false);
                 accelStop.setEnabled(true);
+                bmp.setEnabled(true);
+                sbrk.setEnabled(true);
+                ibrk.setEnabled(true);
+                ph.setEnabled(true);
 
                 try {
                     its = new File(Environment.getExternalStorageDirectory() + "/Intelligence Transport System");
@@ -124,7 +160,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 
                 accelSensorData = new ArrayList<AccelData>();
                 accelResultData = new ArrayList<AccelData>();
-                layout2.removeAllViews();
+                layout2.removeAllViewsInLayout();
                 accelLine = new AccelLineGraph();
                 view2 = accelLine.getGraph(MainActivity.this);
                 layout2.addView(view2);
@@ -140,9 +176,61 @@ public class MainActivity extends Activity implements SensorEventListener {
                 accelstarted = false;
                 accelStart.setEnabled(true);
                 accelStop.setEnabled(false);
+                bmp.setEnabled(false);
+                ph.setEnabled(false);
+                ibrk.setEnabled(false);
+                sbrk.setEnabled(false);
                 writeEntireDataAccel(now);
                 takeScreenShotAccel(now);
-                sensorManager.unregisterListener(MainActivity.this);
+                sensorManager.unregisterListener(MainActivity.this, accelSensor);
+            }
+        });
+
+        // On pressing Bump button
+        bmp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date now = new Date();
+                //ArrayList<AccelData> record=accelResultData;
+                takeScreenShotAccel(now);
+                //writeTrainingSet(record, now);
+                //writeResultSet(record, now);
+            }
+        });
+
+        // On pressing the Pothole button
+        ph.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date now = new Date();
+                //ArrayList<AccelData> record=accelResultData;
+                takeScreenShotAccel(now);
+                //writeTrainingSet(record, now);
+                //writeResultSet(record, now);
+            }
+        });
+
+        // On pressing the Slow break button
+        sbrk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date now = new Date();
+                //ArrayList<AccelData> record=accelResultData;
+                takeScreenShotAccel(now);
+                //writeTrainingSet(record, now);
+                //writeResultSet(record, now);
+            }
+        });
+
+        // On pressing the Immediate break button
+        ibrk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date now = new Date();
+                //ArrayList<AccelData> record=accelResultData;
+                takeScreenShotAccel(now);
+                //writeTrainingSet(record, now);
+                //writeResultSet(record, now);
             }
         });
         
@@ -186,13 +274,13 @@ public class MainActivity extends Activity implements SensorEventListener {
                     Toast.makeText(getApplicationContext(),"folders not created", Toast.LENGTH_SHORT).show();
                 }
 
+                sensorManager.registerListener(MainActivity.this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
                 lightSensorData = new ArrayList<LightData>();
                 lightResultData = new ArrayList<LightData>();
-                layout.removeAllViews();
+                layout.removeAllViewsInLayout();
                 lightLine = new LightLineGraph();
                 view = lightLine.getGraph(MainActivity.this);
                 layout.addView(view);
-                sensorManager.registerListener(MainActivity.this, lightSensor, SensorManager.SENSOR_DELAY_NORMAL);
             }
         });
 
@@ -205,12 +293,12 @@ public class MainActivity extends Activity implements SensorEventListener {
                 lightStop.setEnabled(false);
                 writeEntireDataLight(now);
                 takeScreenShotLight(now);
-                sensorManager.unregisterListener(MainActivity.this);
+                sensorManager.unregisterListener(MainActivity.this, lightSensor);
 
             }
         });
 
-        /*soundStart.setOnClickListener(new View.OnClickListener() {
+        soundStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 soundstarted = true;
@@ -249,15 +337,15 @@ public class MainActivity extends Activity implements SensorEventListener {
                     Toast.makeText(getApplicationContext(),"folders not created", Toast.LENGTH_SHORT).show();
                 }
 
-                soundSensorData = new ArrayList<SoundData>();
-                soundResultData = new ArrayList<SoundData>();
-                layout3.removeAllViews();
-                soundLine = new SoundLineGraph();
-                view3 = soundLine.getGraph(MainActivity.this);
-                layout3.addView(view3);
-                sensorManager.registerListener(MainActivity.this, soundSensor, SensorManager.SENSOR_DELAY_NORMAL);
+                //soundSensorData = new ArrayList<SoundData>();
+                //soundResultData = new ArrayList<SoundData>();
+                //layout3.removeAllViews();
+                //soundLine = new SoundLineGraph();
+                //view3 = soundLine.getGraph(MainActivity.this);
+                //layout3.addView(view3);
+                //sensorManager.registerListener(MainActivity.this, soundSensor, SensorManager.SENSOR_DELAY_NORMAL);
             }
-        });*/
+        });
     }
 
     @Override
@@ -432,7 +520,50 @@ public class MainActivity extends Activity implements SensorEventListener {
     /**
      * Check for the battery status.
      */
-    protected boolean checkBatteryStatus() {
-        return false;
+    private void getBatteryPercentage() {
+        BroadcastReceiver batteryLevelReceiver = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                context.unregisterReceiver(this);
+                int currentLevel = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1);
+                int scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1);
+                int level = -1;
+                if (currentLevel >= 0 && scale > 0) {
+                    level = (currentLevel * 100) / scale;
+                }
+                //battery.setText("Battery Level Remaining: " + level + "%");
+            }
+        };
+        IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
+        registerReceiver(batteryLevelReceiver, batteryLevelFilter);
     }
+
+    /**
+     * Display the notification based on battery status
+     * @param v
+     */
+    public void getNotification(View v) {
+        final int NOTIFICATION_ID = 0;
+        PendingIntent dismissIntent = CustomNotification.dismissNotification(NOTIFICATION_ID, this);
+        PendingIntent actionIntent = CustomNotification.acceptNotification(NOTIFICATION_ID, this);
+        NotificationManager notManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+        // Build the notification object along with its custom values.
+        Notification notif = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.ic_stat_battery)
+                .setContentTitle("Intelligent Transport System")
+                .setContentText("Low Battery Warning")
+                .setTicker("Intelligent Transport System Notification")
+                .addAction(R.drawable.ic_dismiss, "Dismiss", dismissIntent)
+                .addAction(R.drawable.ic_open, "OK", actionIntent)
+                .setAutoCancel(true)
+                .build();
+
+        // Set the default vibration and sound features.
+        notif.defaults |= Notification.DEFAULT_VIBRATE;
+        notif.defaults |= Notification.DEFAULT_SOUND;
+
+        notManager.notify(NOTIFICATION_ID,notif);
+    }
+
+
 }
